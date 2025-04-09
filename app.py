@@ -1,18 +1,16 @@
 from flask import Flask, request, send_file, jsonify
 from gtts import gTTS
 from flask_cors import CORS
+from deep_translator import GoogleTranslator
 import uuid
 import os
-
-# תרגום
-from googletrans import Translator
 
 app = Flask(__name__)
 CORS(app)
 
 @app.route('/')
 def home():
-    return "gTTS API is running."
+    return "gTTS & Translate API is running."
 
 @app.route('/tts', methods=['POST'])
 def tts():
@@ -39,11 +37,10 @@ def translate():
         return jsonify({"error": "No text provided"}), 400
 
     try:
-        translator = Translator()
-        result = translator.translate(text, src='he', dest='am')
+        translated_text = GoogleTranslator(source='hebrew', target='amharic').translate(text)
         return jsonify({
             "original": text,
-            "translated": result.text
+            "translated": translated_text
         })
     except Exception as e:
         return jsonify({"error": str(e)}), 500

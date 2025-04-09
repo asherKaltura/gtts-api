@@ -21,7 +21,7 @@ def tts():
         return jsonify({"error": "No text provided"}), 400
 
     filename = f"{uuid.uuid4()}.mp3"
-    tts = gTTS(text=text, lang='am')
+    tts = gTTS(text=text, lang='am'  ,slow=True)
     tts.save(filename)
 
     @after_this_request

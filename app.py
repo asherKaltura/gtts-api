@@ -1,4 +1,4 @@
-from flask import Flask, request, send_file, jsonify
+from flask import Flask, request, send_file, jsonify, after_this_request
 from gtts import gTTS
 from flask_cors import CORS
 from deep_translator import GoogleTranslator
@@ -21,12 +21,18 @@ def tts():
         return jsonify({"error": "No text provided"}), 400
 
     filename = f"{uuid.uuid4()}.mp3"
-    tts = gTTS(text=text, lang='am')  # שפה: אמהרית
+    tts = gTTS(text=text, lang='am')
     tts.save(filename)
 
-    response = send_file(filename, mimetype='audio/mpeg')
-    os.remove(filename)
-    return response
+    @after_this_request
+    def remove_file(response):
+        try:
+            os.remove(filename)
+        except Exception as e:
+            print(f"Error removing file: {e}")
+        return response
+
+    return send_file(filename, mimetype='audio/mpeg')
 
 @app.route('/translate', methods=['POST'])
 def translate():
